@@ -27,7 +27,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Deploying the Spring Boot Application..."
-                bat 'java -jar target\\WelcomeApp1-0.0.1-SNAPSHOT.jar'
+                bat 'start /B java -jar target\\WelcomeApp1-0.0.1-SNAPSHOT.jar'
             }
         }
     }
