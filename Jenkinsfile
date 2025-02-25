@@ -1,5 +1,6 @@
 pipeline {
-    agent any 
+    agent any
+
     stages {
         stage('Checkout') {
             steps {
@@ -15,15 +16,13 @@ pipeline {
 
         stage('Test') {
             steps {
-                
                 bat 'mvn test'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying the Spring Boot Application...'
-                
+                echo "Deploying the Spring Boot Application..."
                 bat 'java -jar target\\WelcomeApp1-0.0.1-SNAPSHOT.jar'
             }
         }
@@ -31,10 +30,10 @@ pipeline {
 
     post {
         success {
-            echo  Build completed successfully!'
+            echo "Build completed successfully!"
         }
         failure {
-            echo 'Build failed. Please check the logs for more details.'
+            echo "Build failed. Please check the logs for more details."
         }
     }
 }
