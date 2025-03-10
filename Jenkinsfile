@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
+        DOCKER_IMAGE = 'hhameem/welcomeapp:v1'
+    }
+
     tools {
         maven 'Maven'
     }
@@ -8,26 +13,46 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+              
                 git branch: 'main', url: 'https://github.com/HHameem/COMP367-WelcomeApp.git'
             }
         }
 
-        stage('Build') {
+        stage('Build Maven Project') {
             steps {
+                // Build the Maven project
                 bat 'mvn clean package'
             }
         }
 
-        stage('Test') {
+        stage('Docker Login') {
             steps {
-                bat 'mvn test'
+                script {
+                    
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        sh 'echo Docker login successful'
+                    }
+                }
             }
         }
 
-        stage('Deploy') {
+        stage('Build Docker Image') {
             steps {
-                echo "Deploying the Spring Boot Application..."
-                bat 'start /B java -jar target\\WelcomeApp1-0.0.1-SNAPSHOT.jar'
+                script {
+                    
+                    docker.build(DOCKER_IMAGE)
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                   
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        docker.image(DOCKER_IMAGE).push()
+                    }
+                }
             }
         }
     }
