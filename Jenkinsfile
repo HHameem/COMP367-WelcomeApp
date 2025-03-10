@@ -6,21 +6,15 @@ pipeline {
         DOCKER_IMAGE = 'hhameem/welcomeapp:v1'
     }
 
-    tools {
-        maven 'Maven'
-    }
-
     stages {
         stage('Checkout') {
             steps {
-              
                 git branch: 'main', url: 'https://github.com/HHameem/COMP367-WelcomeApp.git'
             }
         }
 
         stage('Build Maven Project') {
             steps {
-                // Build the Maven project
                 bat 'mvn clean package'
             }
         }
@@ -28,9 +22,9 @@ pipeline {
         stage('Docker Login') {
             steps {
                 script {
-                    
+                   
                     docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
-                        sh 'echo Docker login successful'
+                        bat 'echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin'
                     }
                 }
             }
@@ -39,7 +33,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    
                     docker.build(DOCKER_IMAGE)
                 }
             }
@@ -48,7 +41,6 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                   
                     docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
                         docker.image(DOCKER_IMAGE).push()
                     }
@@ -66,4 +58,5 @@ pipeline {
         }
     }
 }
+
 
